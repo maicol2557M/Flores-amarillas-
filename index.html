@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Feliz dia amor - Flores Amarillas</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #000;
+      color: yellow;
+      font-family: 'Arial', sans-serif;
+      overflow: hidden;
+      text-align: center;
+      position: relative;
+      height: 100vh;
+    }
+
+    .balloons {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+      gap: 10px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .balloon {
+      width: 60px;
+      height: 80px;
+      border-radius: 50%;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 20px;
+      animation: float 3s ease-in-out infinite;
+      user-select: none;
+    }
+
+    .balloon:nth-child(odd) {
+      background: gold;
+      color: white;
+    }
+
+    .balloon:nth-child(even) {
+      color: black;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-20px);
+      }
+    }
+
+    h1 {
+      font-size: 2.5em;
+      animation: fadeIn 2s ease-in-out forwards;
+      margin-top: 30px;
+      position: relative;
+      z-index: 10;
+    }
+
+    h2 {
+      font-size: 2em;
+      color: yellow;
+      animation: pulse 2s infinite;
+      position: relative;
+      z-index: 10;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    .flowers {
+      margin-top: 100px;
+      animation: fadeIn 3s ease-in-out forwards;
+      position: relative;
+      z-index: 10;
+    }
+
+    .flowers img {
+      width: 400px;
+      user-select: none;
+    }
+
+    /* Canvas full screen para fuegos artificiales */
+    #canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .boton {
+      background-color: #FBFA3E;
+      width: 200px;
+      height: 50px;
+      margin-top: 50px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="balloons">
+    <div class="balloon">❤</div>
+    <div class="balloon">I</div>
+    <div class="balloon">❤</div>
+    <div class="balloon">L</div>
+    <div class="balloon">O</div>
+    <div class="balloon">V</div>
+    <div class="balloon">E</div>
+    <div class="balloon">❤</div>
+  </div>
+
+  <h1>Flores para ti</h1>
+  <h2>TE AMO</h2>
+
+  <div class="flowers">
+    <img src="flores.jpg" alt="Girasoles" />
+  </div>
+  
+  <div><a href="arbol.html"><button type="submit" class="boton">PRECIONAR</button></a></div>
+  
+  <canvas id="canvas"></canvas>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Ajustar canvas tamaño
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    const fireworks = [];
+
+    // Genera un número aleatorio entre min y max
+    function random(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    // Partícula individual de fuego artificial
+    class Particle {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.radius = 2;
+        this.color = color;
+        this.vx = random(-3, 3);
+        this.vy = random(-3, 3);
+        this.alpha = 1;
+        this.gravity = 0.05;
+        this.friction = 0.98;
+      }
+
+      update() {
+        this.vx *= this.friction;
+        this.vy *= this.friction;
+        this.vy += this.gravity;
+        this.x += this.vx;
+        this.y += this.vy;
+        this.alpha -= 0.015;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.beginPath();
+        ctx.fillStyle = this.color;
+        ctx.shadowColor = this.color;
+        ctx.shadowBlur = 8;
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    // Crea explosión de partículas (fuego artificial)
+    function createFirework() {
+  const x = random(100, canvas.width - 100);
+  const y = random(100, canvas.height - 200);
+  const count = 40;
+
+  for (let i = 0; i < count; i++) {
+    // Color amarillo fijo
+    const color = `hsl(50, 100%, 60%)`;
+    fireworks.push(new Particle(x, y, color));
+  }
+}
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = fireworks.length - 1; i >= 0; i--) {
+        const p = fireworks[i];
+        p.update();
+        p.draw();
+
+        if (p.alpha <= 0) {
+          fireworks.splice(i, 1);
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    // Lanzar fuegos artificiales cada segundo
+    setInterval(createFirework, 1000);
+
+    animate();
+  </script>
+</body>
+</html>
